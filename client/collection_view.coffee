@@ -86,6 +86,10 @@ Template._houston_collection_view.events
       id = $('td:first-child a', $this.parents('tr')).html()
       field_name = $this.data('field')
       update_dict = {}
+
+      if $.isNumeric(updated_val)
+        updated_val = Number(updated_val)
+
       update_dict[field_name] = updated_val
       Houston._call("#{Houston._session('collection_name')}_update",
         id, $set: update_dict)
@@ -115,6 +119,7 @@ Template._houston_collection_view.events
     for field in $create_row.find('input[type="text"]')
       # Unflatten the field names (e.g. foods.app -> {foods: {app:}})
       keys = field.name.split('.')
+      key_val = field.value
       final_key = keys.pop()
 
       doc_iter = new_doc
@@ -122,7 +127,10 @@ Template._houston_collection_view.events
         doc_iter[key] = {} unless doc_iter[key]
         doc_iter = doc_iter[key]
 
-      doc_iter[final_key] = field.value
+      if $.isNumeric(key_val)
+        key_val = Number(key_val)
+
+      doc_iter[final_key] = key_val
 
       field.value = ''
     Houston._call("#{Houston._session('collection_name')}_insert", new_doc)
